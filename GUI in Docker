@@ -1,0 +1,51 @@
+# Running GUI Applications from Docker on RHEL 9 (Wayland)
+
+This guide shows how to run graphical applications (e.g., `xterm`, `firefox`) inside a Docker container on **RHEL 9** using **XWayland**.
+
+---
+Step 1. Prerequisites
+
+- RHEL 9 host with a graphical desktop session (`XDG_SESSION_TYPE=wayland`).
+- Docker installed and running.
+- SELinux enabled (mount options will account for this).
+- XWayland already working on host.
+
+__________________________________________________________________________________________________________________________________________
+
+Step 2. Allow Docker Containers to Access X Server
+
+On the **host**:
+```bash
+xhost +SI:localuser:$(whoami)
+__________________________________________________________________________________________________________________________________________
+
+Step 3. Create a Dockerfile
+Save as Dockerfile:
+
+FROM fedora:42
+
+# Install Firefox + X11 utilities
+RUN dnf install -y firefox xterm xorg-x11-xauth && \
+    dnf clean all
+
+CMD ["xterm"]
+___________________________________________________________________________________________________________________________________________
+
+Step 4. Build the Image
+docker build -t gui-test .
+___________________________________________________________________________________________________________________________________________
+
+Step 5. Run the Container with X11 Forwarding
+
+docker run -it --rm \
+    -e DISPLAY=$DISPLAY \
+    -v /tmp/.X11-unix:/tmp/.X11-unix:Z \
+    gui-test
+_________________________________________________________________________________________________________________________________________
+
+Step 6. Test Applications Inside the Container
+Inside the container terminal:
+xterm         # Already works
+firefox       # Should pop up a browser window
+
+_________________________________________________________________________________________________________________________________________
