@@ -1,0 +1,47 @@
+Step 1: Create a Project Directory
+
+mkdir apache-docker
+cd apache-docker
+
+____________________________________________________________________________________________________________________________
+Step 2: Create a Dockerfile
+Create a file named Dockerfile:
+# Use the official Apache HTTP server image
+FROM httpd:2.4
+
+# Copy custom HTML into the web server document root
+COPY ./public-html/ /usr/local/apache2/htdocs/
+
+_____________________________________________________________________________________________________________________________
+ Step 3: Add HTML Content
+Create a folder called public-html:
+mkdir public-html
+
+Inside public-html, create an index.html file:
+<!-- public-html/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Apache in Docker</title>
+</head>
+<body>
+  <h1> Apache is running inside Docker!</h1>
+</body>
+</html>
+______________________________________________________________________________________________________________________________
+
+ Step 4: Build the Docker Image
+Run the following command in your apache-docker directory:
+docker build -t my-apache-server .
+______________________________________________________________________________________________________________________________
+
+Step 5: Run the Apache Container
+docker run -dit --name apache-container -p 8080:80 my-apache-server
+
+This maps container port 80 to host port 8080.
+Visit http://localhost:8080 in your browser.
+______________________________________________________________________________________________________________________________
+
+To Stop and Remove the Container :
+docker stop apache-container
+docker rm apache-container
