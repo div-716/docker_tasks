@@ -1,0 +1,24 @@
+Method 1: Using official docker:dind image (Running Docker daemon inside container)
+This runs a full Docker daemon inside the container.
+
+> docker run --privileged --name dind-test -d docker:dind
+
+privileged is required for Docker daemon to function inside container.
+The container now runs dockerd (Docker daemon).
+You can exec into the container and run docker commands.
+
+> docker exec -it dind-test sh
+# Inside container:
+> docker info
+> docker run hello-world
+
+__________________________________________________________________________________________
+
+Method 2: Using Docker client with host Docker daemon (socket binding)
+If you just want to run Docker commands inside a container but rely on host Docker, run:
+
+> docker run -it --rm -v /var/run/docker.sock:/var/run/docker.sock docker
+
+This container uses the Docker client.
+It talks to the host Docker daemon over the mounted socket.
+No daemon inside the container.
