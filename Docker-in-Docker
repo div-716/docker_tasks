@@ -22,3 +22,14 @@ If you just want to run Docker commands inside a container but rely on host Dock
 This container uses the Docker client.
 It talks to the host Docker daemon over the mounted socket.
 No daemon inside the container.
+
+Important notes
+Security:
+Running --privileged containers and mounting Docker socket give elevated privileges, so be careful in production environments.
+
+Use cases:
+If you want isolation and a separate Docker daemon, use DIND.
+If you just want to run Docker commands inside a container and don’t need full isolation, use socket binding.
+
+Performance:
+DIND can be slower and requires more resources.
