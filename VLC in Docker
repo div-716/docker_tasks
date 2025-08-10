@@ -1,0 +1,58 @@
+VLC in Docker with GUI + sound on Linux:
+
+> mkdir soundcard-docker
+> cd soundcard-docker
+
+Step1 :
+Dockerfile
+
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install vlc, pulseaudio client, dbus, and utilities
+RUN apt-get update && apt-get install -y \
+    vlc \
+    pulseaudio \
+    dbus-x11 \
+    x11-utils \
+    sudo \
+    && apt-get clean
+
+# Create user 'divya' with home directory, no password
+RUN useradd -m divya && echo "divya ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+USER divya
+WORKDIR /home/divya
+
+CMD ["vlc"]
+____________________________________________________________________________________________________________________________________________
+Step 2: Build the Docker image
+docker build -t vlc-simple .
+____________________________________________________________________________________________________________________________________________
+
+Step 3: Allow local docker containers to access X server
+xhost +local:docker
+
+_____________________________________________________________________________________________________________________________________________
+Step 4: Run the container with GUI and audio support
+Replace 1000 with your user ID if different (id -u):
+docker run -it --rm \
+    -e DISPLAY=$DISPLAY \
+    -e PULSE_SERVER=unix:/run/user/1000/pulse/native \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -v /run/user/1000/pulse/native:/run/user/1000/pulse/native \
+    --device /dev/snd \
+    --user $(id -u):$(id -g) \
+    vlc-simple
+_____________________________________________________________________________________________________________________________________________
+
+Explanation:
+> Runs VLC as non-root user divya inside container (with a proper home dir)
+> Shares X11 socket to show VLC GUI on your host desktop
+> Shares PulseAudio UNIX socket for audio output on your host
+> Maps sound devices /dev/snd to allow ALSA passthrough if needed
+> Uses your host user UID and GID to avoid permission issues with PulseAudio socket
+
+_______________________________________________________________________________________________________________________________________________
+After the container starts, VLC GUI window should pop up on your desktop and audio will work through your host sound card.
