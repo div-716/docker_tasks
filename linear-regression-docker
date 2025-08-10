@@ -1,0 +1,74 @@
+Step 1. Prepare the Python Script
+Create a file named linear_regression.py with this content:
+# linear_regression.py
+
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+# Sample data
+# X = feature(s), y = target
+X = np.array([[1], [2], [3], [4], [5]])
+y = np.array([3, 4, 2, 5, 6])
+
+# Create and train the model
+model = LinearRegression()
+model.fit(X, y)
+
+# Print coefficients
+print(f"Coefficient: {model.coef_[0]}")
+print(f"Intercept: {model.intercept_}")
+
+# Predict
+X_new = np.array([[6]])
+y_pred = model.predict(X_new)
+print(f"Prediction for input {X_new.flatten()[0]}: {y_pred[0]}")
+
+____________________________________________________________________________________________
+
+Step 2. Create a Dockerfile
+Create a file named Dockerfile in the same folder with:
+
+# Use official Python image from Docker Hub
+FROM python:3.11-slim
+
+# Set working directory inside container
+WORKDIR /app
+
+# Copy requirements file
+COPY requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the Python script into container
+COPY linear_regression.py .
+
+# Command to run the script
+CMD ["python", "linear_regression.py"]
+_______________________________________________________________________________________________
+
+Step 3. Create a requirements.txt file
+List Python dependencies:
+numpy
+scikit-learn
+________________________________________________________________________________________________
+Step 4. Build the Docker Image
+Open terminal/command prompt in the folder where these files are saved, then run:
+> docker build -t linear-regression-python .
+_________________________________________________________________________________________________
+Step 5. Run the Docker Container
+Once built, run:
+> docker run --rm linear-regression-python
+
+You should see output like:
+Coefficient: 0.7
+Intercept: 2.0
+Prediction for input 6: 6.2
+_________________________________________________________________________________________________
+
+Summary :
+linear_regression.py contains your model code.
+Dockerfile sets up a Python environment with dependencies.
+requirements.txt lists libraries.
+docker build creates the image.
+docker run executes your script inside the container.
